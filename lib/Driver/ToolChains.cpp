@@ -4397,6 +4397,8 @@ std::string Linux::getDynamicLinker(const ArgList &Args) const {
     LibDir = "lib";
     Loader = "ld-linux.so.2";
     break;
+  case llvm::Triple::cpu0: // FIXME: Not implemented yet. Let's say we use x86's
+                           // one.
   case llvm::Triple::x86_64: {
     bool X32 = Triple.getEnvironment() == llvm::Triple::GNUX32;
 

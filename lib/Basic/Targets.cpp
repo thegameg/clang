@@ -7144,6 +7144,43 @@ public:
   }
 };
 
+class Cpu0TargetInfo : public TargetInfo {
+public:
+  Cpu0TargetInfo(const llvm::Triple &Triple, const TargetOptions &)
+      : TargetInfo(Triple) {
+    LongWidth = LongAlign = PointerWidth = PointerAlign = 32;
+    SizeType = UnsignedLong;
+    PtrDiffType = SignedLong;
+    IntPtrType = SignedLong;
+    IntMaxType = SignedLong;
+    Int64Type = SignedLong;
+    RegParmMax = 2;
+    BigEndian = false;
+    resetDataLayout("e-p:32:32");
+    TLSSupported = false;
+  }
+
+  void getTargetDefines(const LangOptions &Opts,
+                        MacroBuilder &Builder) const override {
+    DefineStd(Builder, "cpu0", Opts);
+    Builder.defineMacro("__cpu0__");
+  }
+
+  ArrayRef<Builtin::Info> getTargetBuiltins() const override { return None; }
+  const char *getClobbers() const override { return ""; }
+  BuiltinVaListKind getBuiltinVaListKind() const override {
+    return TargetInfo::VoidPtrBuiltinVaList;
+  }
+  ArrayRef<const char *> getGCCRegNames() const override { return None; }
+  bool validateAsmConstraint(const char *&Name,
+                             TargetInfo::ConstraintInfo &info) const override {
+    return true;
+  }
+  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+    return None;
+  }
+};
+
 class MipsTargetInfo : public TargetInfo {
   void setDataLayout() {
     StringRef Layout;
@@ -8605,6 +8642,8 @@ static TargetInfo *AllocateTarget(const llvm::Triple &Triple,
     return new LinuxTargetInfo<RenderScript32TargetInfo>(Triple, Opts);
   case llvm::Triple::renderscript64:
     return new LinuxTargetInfo<RenderScript64TargetInfo>(Triple, Opts);
+  case llvm::Triple::cpu0:
+    return new Cpu0TargetInfo(Triple, Opts);
   }
 }
 
